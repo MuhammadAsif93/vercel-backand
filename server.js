@@ -17,8 +17,18 @@ const allowed = (process.env.CORS_ORIGINS || "")
   .filter(Boolean);
 
 app.use(
-  cors({ origin: (origin, cb) => cb(null, !origin || allowed.includes(origin)) })
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowed.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
 );
+
 
 app.use("/api/contact", rateLimit({ windowMs: 60 * 1000, max: 5 }));
 
